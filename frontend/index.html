@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteca - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8" x-data="authForm()">
+            <!-- Logo e Header -->
+            <div class="text-center">
+                <svg class="mx-auto h-16 w-16 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+                <h2 class="mt-6 text-3xl font-extrabold text-gray-900">Sistema de Biblioteca</h2>
+                <p class="mt-2 text-sm text-gray-600" x-text="isLogin ? 'Faça login na sua conta' : 'Crie sua conta'"></p>
+            </div>
+
+            <!-- Toggle Login/Registro -->
+            <div class="flex bg-gray-200 rounded-lg p-1">
+                <button @click="isLogin = true"
+                        :class="isLogin ? 'bg-white shadow' : 'bg-transparent'"
+                        class="flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all">
+                    Login
+                </button>
+                <button @click="isLogin = false"
+                        :class="!isLogin ? 'bg-white shadow' : 'bg-transparent'"
+                        class="flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all">
+                    Registro
+                </button>
+            </div>
+
+            <!-- Mensagem de Erro -->
+            <div x-show="error" x-transition class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                <span x-text="error"></span>
+            </div>
+
+            <!-- Mensagem de Sucesso -->
+            <div x-show="success" x-transition class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm">
+                <span x-text="success"></span>
+            </div>
+
+            <!-- Formulário de Login -->
+            <form x-show="isLogin" @submit.prevent="handleLogin" class="mt-8 space-y-6">
+                <div class="space-y-4">
+                    <div>
+                        <label for="login-username" class="block text-sm font-medium text-gray-700">Usuário</label>
+                        <input id="login-username"
+                               type="text"
+                               x-model="loginForm.username"
+                               required
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="login-password" class="block text-sm font-medium text-gray-700">Senha</label>
+                        <input id="login-password"
+                               type="password"
+                               x-model="loginForm.password"
+                               required
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <button type="submit"
+                        :disabled="loading"
+                        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                    <span x-show="!loading">Entrar</span>
+                    <span x-show="loading" class="flex items-center">
+                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Carregando...
+                    </span>
+                </button>
+            </form>
+
+            <!-- Formulário de Registro -->
+            <form x-show="!isLogin" @submit.prevent="handleRegister" class="mt-8 space-y-6">
+                <div class="space-y-4">
+                    <div>
+                        <label for="register-username" class="block text-sm font-medium text-gray-700">Usuário</label>
+                        <input id="register-username"
+                               type="text"
+                               x-model="registerForm.username"
+                               required
+                               minlength="3"
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="register-email" class="block text-sm font-medium text-gray-700">Email</label>
+                        <input id="register-email"
+                               type="email"
+                               x-model="registerForm.email"
+                               required
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="register-password" class="block text-sm font-medium text-gray-700">Senha</label>
+                        <input id="register-password"
+                               type="password"
+                               x-model="registerForm.password"
+                               required
+                               minlength="6"
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="register-confirm-password" class="block text-sm font-medium text-gray-700">Confirmar Senha</label>
+                        <input id="register-confirm-password"
+                               type="password"
+                               x-model="registerForm.confirm_password"
+                               required
+                               minlength="6"
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <button type="submit"
+                        :disabled="loading"
+                        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                    <span x-show="!loading">Criar Conta</span>
+                    <span x-show="loading" class="flex items-center">
+                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Carregando...
+                    </span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="assets/api.js"></script>
+    <script>
+        function authForm() {
+            return {
+                isLogin: true,
+                loading: false,
+                error: '',
+                success: '',
+                loginForm: {
+                    username: '',
+                    password: ''
+                },
+                registerForm: {
+                    username: '',
+                    email: '',
+                    password: '',
+                    confirm_password: ''
+                },
+
+                async handleLogin() {
+                    this.error = '';
+                    this.success = '';
+
+                    if (!this.loginForm.username || !this.loginForm.password) {
+                        this.error = 'Por favor, preencha todos os campos.';
+                        return;
+                    }
+
+                    this.loading = true;
+
+                    try {
+                        const data = new URLSearchParams();
+                        data.append('username', this.loginForm.username);
+                        data.append('password', this.loginForm.password);
+
+                        const response = await fetch('http://localhost:8000/api/auth/login', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: data
+                        });
+
+                        const result = await response.json();
+
+                        if (response.ok) {
+                            localStorage.setItem('access_token', result.access_token);
+                            localStorage.setItem('token_type', result.token_type);
+                            this.success = 'Login realizado com sucesso! Redirecionando...';
+                            setTimeout(() => {
+                                window.location.href = 'dashboard.html';
+                            }, 1000);
+                        } else {
+                            this.error = result.detail || 'Credenciais inválidas.';
+                        }
+                    } catch (error) {
+                        this.error = 'Erro ao conectar com o servidor. Verifique se a API está rodando.';
+                        console.error('Login error:', error);
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                async handleRegister() {
+                    this.error = '';
+                    this.success = '';
+
+                    if (!this.registerForm.username || !this.registerForm.email ||
+                        !this.registerForm.password || !this.registerForm.confirm_password) {
+                        this.error = 'Por favor, preencha todos os campos.';
+                        return;
+                    }
+
+                    if (this.registerForm.password !== this.registerForm.confirm_password) {
+                        this.error = 'As senhas não coincidem.';
+                        return;
+                    }
+
+                    if (this.registerForm.password.length < 6) {
+                        this.error = 'A senha deve ter no mínimo 6 caracteres.';
+                        return;
+                    }
+
+                    this.loading = true;
+
+                    try {
+                        const response = await fetch('http://localhost:8000/api/auth/register', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                username: this.registerForm.username,
+                                email: this.registerForm.email,
+                                password: this.registerForm.password
+                            })
+                        });
+
+                        const result = await response.json();
+
+                        if (response.ok) {
+                            this.success = 'Conta criada com sucesso! Faça login para continuar.';
+                            this.registerForm = {
+                                username: '',
+                                email: '',
+                                password: '',
+                                confirm_password: ''
+                            };
+                            setTimeout(() => {
+                                this.isLogin = true;
+                                this.success = '';
+                            }, 2000);
+                        } else {
+                            this.error = result.detail || 'Erro ao criar conta.';
+                        }
+                    } catch (error) {
+                        this.error = 'Erro ao conectar com o servidor. Verifique se a API está rodando.';
+                        console.error('Register error:', error);
+                    } finally {
+                        this.loading = false;
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
