@@ -4,39 +4,16 @@
     {
       "src": "api/index.py",
       "use": "@vercel/python"
-    },
-    {
-      "src": "api/test.py",
-      "use": "@vercel/python"
-    },
-    {
-      "src": "frontend/**",
-      "use": "@vercel/static"
     }
   ],
   "routes": [
-    {
-      "src": "/test",
-      "dest": "api/test.py"
-    },
     {
       "src": "/api/(.*)",
       "dest": "api/index.py"
     },
     {
-      "src": "/(assets/.*)",
+      "src": "/(.*)",
       "dest": "frontend/$1"
-    },
-    {
-      "src": "/(.*\\.html)",
-      "dest": "frontend/$1"
-    },
-    {
-      "src": "/",
-      "dest": "frontend/index.html"
     }
-  ],
-  "env": {
-    "PYTHON_VERSION": "3.11"
-  }
+  ]
 }
