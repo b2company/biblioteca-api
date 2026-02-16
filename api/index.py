@@ -1,10 +1,17 @@
-import sys
-import os
-
-# Add parent directory to path
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-
+"""Simple FastAPI test without backend dependencies."""
+from fastapi import FastAPI
 from mangum import Mangum
-from backend.main import app
 
+# Create a simple FastAPI app
+app = FastAPI()
+
+@app.get("/")
+def root():
+    return {"status": "ok", "message": "API is working!"}
+
+@app.get("/health")
+def health():
+    return {"status": "healthy"}
+
+# Handler for Vercel
 handler = Mangum(app, lifespan="off")
