@@ -4,8 +4,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.database import engine, Base
 from backend.routers import auth, users, categories, books, loans
 
-# Criar tabelas no startup
-Base.metadata.create_all(bind=engine)
+# Criar tabelas no startup - DESABILITADO EM PRODUÇÃO
+# As tabelas devem ser criadas via script de seed em produção
+# Base.metadata.create_all(bind=engine)
 
 # Criar aplicação FastAPI
 app = FastAPI(
@@ -14,25 +15,32 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Configurar CORS baseado no ambiente
-# Em produção, use a URL do frontend da Vercel
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:8080")
+# Configurar CORS
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 
 if ENVIRONMENT == "production":
-    # Produção: permite apenas a origem do frontend
-    allowed_origins = [FRONTEND_URL, "https://*.vercel.app"]
+    # Produção: permite Vercel
+    allowed_origins = [
+        "https://biblioteca-api-theta.vercel.app",
+        "https://*.vercel.app"
+    ]
+    allow_origin_regex = "https://.*\.vercel\.app"
 else:
     # Desenvolvimento: permite todas as origens
     allowed_origins = ["*"]
+    allow_origin_regex = None
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+cors_config = {
+    "allow_origins": allowed_origins,
+    "allow_credentials": True,
+    "allow_methods": ["*"],
+    "allow_headers": ["*"],
+}
+
+if allow_origin_regex:
+    cors_config["allow_origin_regex"] = allow_origin_regex
+
+app.add_middleware(CORSMiddleware, **cors_config)
 
 # Incluir routers
 app.include_router(auth.router)
