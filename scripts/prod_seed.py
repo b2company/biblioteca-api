@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from backend.database import engine, Base, SessionLocal
 from backend.models import User, Category
-from backend.auth import get_password_hash
+from backend.auth import hash_password
 
 def create_tables():
     """Cria todas as tabelas no banco."""

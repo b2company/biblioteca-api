@@ -260,7 +260,7 @@
                 async loadUser() {
                     try {
                         const token = localStorage.getItem('access_token');
-                        const response = await fetch('http://localhost:8000/api/users/me', {
+                        const response = await fetch(`${window.API_BASE_URL}/users/me', {
                             headers: { 'Authorization': `Bearer ${token}` }
                         });
                         if (response.ok) {
@@ -274,7 +274,7 @@
                 async loadBooks() {
                     try {
                         const token = localStorage.getItem('access_token');
-                        const response = await fetch('http://localhost:8000/api/books/', {
+                        const response = await fetch(`${window.API_BASE_URL}/books/', {
                             headers: { 'Authorization': `Bearer ${token}` }
                         });
                         if (response.ok) {
@@ -346,8 +346,8 @@
                     try {
                         const token = localStorage.getItem('access_token');
                         const url = this.editingBook
-                            ? `http://localhost:8000/api/books/${this.editingBook.id}`
-                            : 'http://localhost:8000/api/books/';
+                            ? `${window.API_BASE_URL}/books/${this.editingBook.id}`
+                            : `${window.API_BASE_URL}/books/';
 
                         const response = await fetch(url, {
                             method: this.editingBook ? 'PUT' : 'POST',
@@ -375,7 +375,7 @@
 
                     try {
                         const token = localStorage.getItem('access_token');
-                        const response = await fetch(`http://localhost:8000/api/books/${id}`, {
+                        const response = await fetch(`${window.API_BASE_URL}/books/${id}`, {
                             method: 'DELETE',
                             headers: { 'Authorization': `Bearer ${token}` }
                         });
@@ -394,7 +394,7 @@
                 async borrowBook(bookId) {
                     try {
                         const token = localStorage.getItem('access_token');
-                        const response = await fetch('http://localhost:8000/api/loans/', {
+                        const response = await fetch(`${window.API_BASE_URL}/loans/', {
                             method: 'POST',
                             headers: {
                                 'Authorization': `Bearer ${token}`,
