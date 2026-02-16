@@ -4,9 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.database import engine, Base
 from backend.routers import auth, users, categories, books, loans
 
-# Criar tabelas no startup - DESABILITADO EM PRODUÇÃO
-# As tabelas devem ser criadas via script de seed em produção
-# Base.metadata.create_all(bind=engine)
+# Criar tabelas no startup
+Base.metadata.create_all(bind=engine)
 
 # Criar aplicação FastAPI
 app = FastAPI(
